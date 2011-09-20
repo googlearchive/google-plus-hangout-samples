@@ -1,0 +1,35 @@
+/*
+ * Copyright 2011 Google Inc. All Rights Reserved.
+ */
+
+body, #canvas {
+  margin: 0;
+  font: 13px Arial, sans-serif;
+  background: transparent;
+}
+
+#avatarList li {
+  border: solid 2px transparent;
+  cursor: pointer;
+  display: inline-block;
+  list-style-type: none;
+}
+
+#avatarList li.selected {
+  border-color: #6fa1d9;
+}
+
+/* Avatar Titles */
+#avatarList div {
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Avatar Thumbnails */
+#avatarList img {
+  vertical-align: middle;
+  margin: 10px 5px;
+  width: 200px;
+  height: 200px;
+  cursor: pointer;
+}
