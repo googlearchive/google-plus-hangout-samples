@@ -62,7 +62,7 @@ project.
 2. In the left side menu, click the 'Hangouts' option.
 
 3. In the Gadget URL field enter this value (substituting your AppEngine app ID)
-   http://YOUR_APP_ID.appspot.com/static/app.xml and click 'Save'.
+   https://YOUR_APP_ID.appspot.com/static/app.xml and click 'Save'.
 
 4. Click on the 'Enter a hangout!' to create a special development hangout.
 
