@@ -1,0 +1,248 @@
+/*
+ * Copyright 2011 Google Inc.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
+ * Style information for Yes/No/Maybe gadget.
+ *
+ * Author: Tim Blasi (Google)
+ */
+
+/* Zero default margin & padding around common elements */
+body, dd, dl, dt, fieldset, form, h1, h2, h3, h4, h5, h6, li, ol, p, ul {
+  margin: 0;
+  border: 0 none #fff;
+  padding: 0;
+}
+
+body {
+  background-color: #fff;
+  color: #000;
+  line-height: 1.4;
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 85%;
+  text-align: left;
+}
+
+a {
+  color: #06c;
+  text-decoration: underline;
+}
+
+a:visited {
+  color: #06c;
+}
+
+a:hover {
+  text-decoration: none;
+}
+
+img {
+  border: 0 none transparent;
+}
+
+input, select, table, textarea {
+  font-size: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.canvas {
+  max-width: 50em;
+}
+
+td {
+  width: 33.3%;
+  padding: 6px;
+  background-color: #e7eeda;
+  vertical-align: top;
+}
+
+#YES {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  -moz-border-radius-bottomleft: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+}
+
+#NO {
+  background-color: #f4d9d9;
+}
+
+#MAYBE {
+  background-color: #fff0d9;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  -moz-border-radius-topright: 6px;
+  -moz-border-radius-bottomright: 6px;
+  -webkit-border-bottom-right-radius: 6px;
+  -webkit-border-bottom-right-radius: 6px;
+}
+
+.button {
+  border: 1px solid #527b09;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+  -webkit-border-radius: 4px;
+  font-size: 16px;
+  text-align: center;
+}
+
+.button a {
+  display: block;
+  height: 25px;
+  border-top: 1px solid #b1cb40;
+  border-left: 1px solid #b1cb40;
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+  background: #9b0 url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAdCAYAAAFtflphAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAALpJREFUeNpi/P//PwM+wAjEEvgUsACxJCEFeE0ACCDGQeAGgAACWcHDQAEg6ARiDJAYUBcABBDBeCBoADUCkWIDeAfcBUM8DAACCBSNbAwDCCgOgmHhAN7RKBjRUQAQQBQXxxQ7YDCUA6MOGHUA+2gUjDpg1AGj2XAgHQAQYKDakJlhBANQAHCO9ADgH+kBIDrSA0BmpAeA0kgPAI2RHgB6IzkABrwhMhoAowEw8AHAPtIDgHU0BYxgAABHiA9sOZGGKwAAAABJRU5ErkJggg==) repeat-x 0 100%;
+  color: #fff;
+  line-height: 25px;
+  text-shadow: rgba(0,0,0,0.5) 1px 1px 0;
+  text-decoration: none;
+}
+
+.button.selected a {
+  outline: none;
+  border-top: 1px solid transparent !important;
+  border-left: 1px solid transparent !important;
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAAAdCAYAAAFtflphAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAANBJREFUeNpiZGBg6GfAA1iA+BUhBR8oUgAQQIyDwA0AAQRyQzMDBQBkwztKDXhPqQHfKDEAIIAIxgMxLvgyoF4AGfBjwA34TqkBPyk14C8lBgAEECgddDEMIKA4HVHDAd8G2gE/R3wI/BpoB/weSAcABBDFxfGQD4FBkQt+jzpgoB3wd6Ad8GfEO+DXiE8Do4nw/0A74N9AOgAgwEDVcQ/DCAYDXhsPhgD4O9ID4NdID4A/Iz0Afo+mgNEAGM0Co9XgaAoYwQHwbzQLjKaAkQsAULI0L67UpEoAAAAASUVORK5CYII=);
+}
+
+.button:hover {
+  border-color: #fcdd65;
+}
+
+#NO .button {
+  border-color: #600;
+}
+
+#NO .button:hover {
+  border-color: #fcdd65;
+}
+
+#NO .button a {
+  border-color: #b55252;
+  background-color: #c00;
+}
+
+#MAYBE .button {
+  border-color: #7f6500;
+}
+
+#MAYBE .button:hover {
+  border-color: #fcdd65;
+}
+
+#MAYBE .button a {
+  border-color: #fcdd65;
+  background-color: #fc0;
+}
+
+.button a span {
+  margin-left: 0.25em;
+  opacity: 0.66;
+  text-shadow: none;
+}
+
+ul {
+  margin: 0 6px 0 6px;
+  list-style: none;
+}
+
+ul li {
+  min-height: 29px;
+  margin-top: 12px;
+  padding-left: 35px;
+}
+
+.avatar {
+  float: left;
+  margin-left: -35px;
+  border: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+h2 {
+  font-size: 13px;
+  line-height: 1.2;
+}
+
+p {
+  font-size: 80%;
+  opacity: 0.66;
+}
+
+.canvas {
+}
+
+table.columns td.yes {
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
+  -moz-border-radius-topleft: 6px;
+  -moz-border-radius-bottomleft: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+  -webkit-border-bottom-left-radius: 6px;
+}
+
+table.columns td.no {
+  background-color: #f4d9d9;
+}
+
+table.columns td.maybe {
+  background-color: #fff0d9;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+  -moz-border-radius-topright: 6px;
+  -moz-border-radius-bottomright: 6px;
+  -webkit-border-bottom-right-radius: 6px;
+  -webkit-border-bottom-right-radius: 6px;
+}
+
+.status-box {
+  position: absolute;
+}
+
+.status-box input {
+  border: 1px solid black;
+  font-size: 8pt;
+}
+
+#status-input {
+  display: none;
+  border: 1px solid blue;
+  background-color: white;
+  font-size: 8pt;
+  width: 11em;
+}
+
+.footer {
+}
+
+.footer img {
+  padding: 4px;
+  width: 38px;
+  height: 23px;
+}
+
+.footer td {
+  padding: 0px;
+  background-color: white;
+}
+
+.footer div {
+  text-align: center;
+  font-size: 9pt;
+  color: gray;
+}
