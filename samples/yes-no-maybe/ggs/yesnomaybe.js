@@ -1,17 +1,19 @@
 /*
- * Copyright 2009 Google Inc.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (c) 2011 Google Inc.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
+
 /**
  * @fileoverview Logic for the Yes/No/Maybe app.
  *
@@ -102,7 +104,7 @@ function defer(func) {
 
 /**
  * Creates a key for use in the shared state.
- * @param {!string} id The user's hangoutId.
+ * @param {!string} id The user's temporary id.
  * @param {!string} key The property to create a key for.
  * @return {!string} A new key for use in the shared state.
  */
@@ -114,7 +116,7 @@ function makeUserKey(id, key) {
  * Makes an RPC call to store the given value(s) in the shared state.
  * @param {!(string|Object.<!string, !string>)} keyOrState Either an object
  *     denoting the desired key value pair(s), or a single string key.
- * @param {!string} opt_value If keyOrState is a string, the associated value.
+ * @param {!string=} opt_value If keyOrState is a string, the associated value.
  */
 var saveValue = null;
 
@@ -130,7 +132,7 @@ var removeValue = null;
  * state.
  * @param {?(string|Object.<!string, !string>)} addState  Either an object
  *     denoting the desired key value pair(s), or a single string key.
- * @param {?(string|Object.<!string, !string>)} opt_removeState A list of keys
+ * @param {?(string|Object.<!string, !string>)=} opt_removeState A list of keys
  *     to remove from the shared state.
  */
 var submitDelta = null;
@@ -140,8 +142,8 @@ var submitDelta = null;
    * Packages the parameters into a delta object for use with submitDelta.
    * @param {!(string|Object.<!string, !string>)}  Either an object denoting
    *     the desired key value pair(s), or a single string key.
-   * @param {!string} opt_value If keyOrState is a string, the associated string
-   *     value.
+   * @param {!string=} opt_value If keyOrState is a string, the associated
+   *     string value.
    */
   var prepareForSave = function(keyOrState, opt_value) {
     var state = null;
@@ -191,8 +193,8 @@ var submitDelta = null;
    * state.
    * @param {?(string|Object.<!string, !string>)} addState  Either an object
    *     denoting the desired key value pair(s), or a single string key.
-   * @param {?(string|Object.<!string, !string>)} opt_removeState A list of keys
-   *     to remove from the shared state.
+   * @param {?(string|Object.<!string, !string>)=} opt_removeState A list of
+   *     keys to remove from the shared state.
    */
   var submitDeltaInternal = function(addState, opt_removeState) {
     gapi.hangout.data.submitDelta(addState, opt_removeState);
@@ -231,7 +233,7 @@ var submitDelta = null;
  * @param {!Answers} newAnswer The user's answer.
  */
 function onAnswer(newAnswer) {
-  // Gets the temporary hangout id, corresponding to Participant.hangoutId
+  // Gets the temporary hangout id, corresponding to Participant.id
   // rather than Participant.id.
   var myId = getUserHangoutId();
 
@@ -246,7 +248,7 @@ function onAnswer(newAnswer) {
 }
 
 /**
- * @param {!string} participantId The hangoutId of a Participant.
+ * @param {!string} participantId The temporary id of a Participant.
  * @return {string} The status of the given Participant.
  */
 function getStatusMessage(participantId) {
@@ -347,24 +349,24 @@ function render() {
   for (var i = 0, iLen = participants_.length; i < iLen; ++i) {
     var p = participants_[i];
     // Temporary id, corresponds to getUserHangoutId().
-    var answerKey = makeUserKey(p.hangoutId, 'answer');
+    var answerKey = makeUserKey(p.id, 'answer');
     var answer = getState(answerKey);
     var meta = getMetadata(answerKey);
 
     if (answer && data[answer]) {
       data[answer].push(p);
-      if (p.hangoutId === myId) {
+      if (p.id === myId) {
         data.responded = true;
       }
       ++data.total;
 
-      var name = p.displayName;
+      var name = p.person.displayName;
       var parts = name.split('@');
       if (parts && parts.length > 1) {
-        p.displayName = parts[0];
+        p.person.displayName = parts[0];
       }
 
-      p.status = getStatusMessage(p.hangoutId) || '';
+      p.status = getStatusMessage(p.id) || '';
       // The server stores a timestamp for us on each change. We'll use this
       // value to display users in the order in which they answer.
       p.sortOrder = meta.timestamp;
@@ -389,13 +391,11 @@ function render() {
 /**
  * Syncs local copies of shared state with those on the server and renders the
  *     app to reflect the changes.
- * @param {!Array.<Object.<!string, *>>} add Entries added to the shared state.
- * @param {!Array.<!string>} remove Entries removed from the shared state.
  * @param {!Object.<!string, !string>} state The shared state.
  * @param {!Object.<!string, Object.<!string, *>>} metadata Data describing the
  *     shared state.
  */
-function onStateChanged(add, remove, state, metadata) {
+function updateLocalDataState(state, metadata) {
   state_ = state;
   metadata_ = metadata;
   render();
@@ -407,7 +407,7 @@ function onStateChanged(add, remove, state, metadata) {
  * @param {!Array.<gapi.hangout.Participant>} participants The new list of
  *     participants.
  */
-function onParticipantsChanged(participants) {
+function updateLocalParticipantsData(participants) {
   participants_ = participants;
   render();
 }
@@ -526,10 +526,10 @@ function createAnswersTable(data) {
 
   if (!data.responded) {
     var instructImg = $('<img />')
-       .attr({
-         'src': '//hangoutsapi.appspot.com/static/yesnomaybe/directions.png',
-         'title': 'Make a selection'
-       });
+        .attr({
+          'src': '//hangoutsapi.appspot.com/static/yesnomaybe/directions.png',
+          'title': 'Make a selection'
+        });
     var instructText = $('<div />')
         .text('Click an option to cast your vote');
     var footDiv = $('<div />').append(instructImg, instructText);
@@ -559,17 +559,17 @@ function createParticipantElement(participant, response) {
     'width': '27',
     'alt': 'Avatar',
     'class': 'avatar',
-    'src': participant.image && participant.image.url ? participant.image.url :
-        DEFAULT_ICONS[response]
+    'src': participant.person.image && participant.person.image.url ?
+        participant.person.image.url : DEFAULT_ICONS[response]
   });
 
-  var name = $('<h2 />').text(participant.displayName);
+  var name = $('<h2 />').text(participant.person.displayName);
 
-  var statusText = getStatusMessage(participant.hangoutId) || '';
+  var statusText = getStatusMessage(participant.id) || '';
   var statusAnchor = $('<p />')
       .addClass('status-anchor')
       .text(statusText + ' ');
-  if (participant.hangoutId === getUserHangoutId()) {
+  if (participant.id === getUserHangoutId()) {
     var triggerLink = $('<a href="#" class="link" />')
         .text(statusText ? 'Edit' : 'Set your status')
         .click(function() {
@@ -586,38 +586,36 @@ function createParticipantElement(participant, response) {
 (function() {
   if (gapi && gapi.hangout) {
 
-    var initHangout = function() {
-      prepareAppDOM();
+    var initHangout = function(apiInitEvent) {
+      if (apiInitEvent.isApiReady) {
+        prepareAppDOM();
 
-      gapi.hangout.data.addStateChangeListener(onStateChanged);
-      gapi.hangout.addParticipantsListener(onParticipantsChanged);
+        gapi.hangout.data.onStateChanged.add(function(stateChangeEvent) {
+          updateLocalDataState(stateChangeEvent.state,
+                               stateChangeEvent.metadata);
+        });
+        gapi.hangout.onParticipantsChanged.add(function(partChangeEvent) {
+          updateLocalParticipantsData(partChangeEvent.participants);
+        });
 
-      if (!state_) {
-        var initState = gapi.hangout.data.getState();
-        var initMetadata = gapi.hangout.data.getStateMetadata();
-        // Since this is the first push, added has all the values in metadata in
-        // Array form.
-        var added = [];
-        for (var key in initMetadata) {
-          if (initMetadata.hasOwnProperty(key)) {
-            added.push(initMetadata[key]);
+        if (!state_) {
+          var state = gapi.hangout.data.getState();
+          var metadata = gapi.hangout.data.getStateMetadata();
+          if (state && metadata) {
+            updateLocalDataState(state, metadata);
           }
         }
-        var removed = [];
-        if (initState && initMetadata) {
-          onStateChanged(added, removed, initState, initMetadata);
+        if (!participants_) {
+          var initParticipants = gapi.hangout.getParticipants();
+          if (initParticipants) {
+            updateLocalParticipantsData(initParticipants);
+          }
         }
-      }
-      if (!participants_) {
-        var initParticipants = gapi.hangout.getParticipants();
-        if (initParticipants) {
-          onParticipantsChanged(initParticipants);
-        }
-      }
 
-      gapi.hangout.removeApiReadyListener(initHangout);
+        gapi.hangout.onApiReady.remove(initHangout);
+      }
     };
 
-    gapi.hangout.addApiReadyListener(initHangout);
+    gapi.hangout.onApiReady.add(initHangout);
   }
 })();

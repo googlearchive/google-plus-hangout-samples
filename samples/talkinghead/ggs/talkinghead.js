@@ -1,17 +1,19 @@
 /*
- * Copyright 2011 Google Inc.
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Copyright (c) 2011 Google Inc.
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License. You may obtain
+ * a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License.
  */
+
 /**
  * @fileoverview Logic for the Talking Head App.
  * @author Tim Blasi (Google)
@@ -32,7 +34,7 @@ var DEBUG = false;
 var participants_ = null;
 
 /**
- * Maps Participant's hangoutIds to their current avatars.
+ * Maps Participant's temporary ids to their current avatars.
  * @type {Object.<!string, !Avatar>}
  * @private
  */
@@ -53,7 +55,7 @@ var DOM_ = {
  * Makes an RPC call to store the given value(s) in the shared state.
  * @param {!(string|Object.<!string, !string>)} keyOrState Either an object
  *     denoting the desired key value pair(s), or a single string key.
- * @param {!string} opt_value If keyOrState is a string, the associated value.
+ * @param {!string=} opt_value If keyOrState is a string, the associated value.
  */
 var saveValue = null;
 
@@ -69,8 +71,8 @@ var removeValue = null;
    * Packages the parameters into a delta object for use with submitDelta.
    * @param {!(string|Object.<!string, !string>)}  Either an object denoting
    *     the desired key value pair(s), or a single string key.
-   * @param {!string} opt_value If keyOrState is a string, the associated string
-   *     value.
+   * @param {!string=} opt_value If keyOrState is a string, the associated
+   *     string value.
    */
   var prepareForSave = function(keyOrState, opt_value) {
     var state = null;
@@ -119,8 +121,8 @@ var removeValue = null;
    * state.
    * @param {?(string|Object.<!string, !string>)} addState  Either an object
    *     denoting the desired key value pair(s), or a single string key.
-   * @param {?(string|Object.<!string, !string>)} opt_removeState A list of keys
-   *     to remove from the shared state.
+   * @param {?(string|Object.<!string, !string>)=} opt_removeState A list of
+   *     keys to remove from the shared state.
    */
   var submitDeltaInternal = function(addState, opt_removeState) {
     gapi.hangout.data.submitDelta(addState, opt_removeState);
@@ -147,11 +149,8 @@ var removeValue = null;
  *     app to reflect the changes.
  * @param {!Array.<Object.<!string, *>>} add Entries added to the shared state.
  * @param {!Array.<!string>} remove Entries removed from the shared state.
- * @param {!Object.<!string, !string>} state The shared state.
- * @param {!Object.<!string, Object.<!string, *>>} metadata Data describing the
- *     shared state.
  */
-function onStateChanged(add, remove, state, metadata) {
+function updateLocalStateData(add, remove) {
   // Update avatarMap_
   avatarMap_ = avatarMap_ || {};
   for (var i = 0, iLen = add.length; i < iLen; ++i) {
@@ -181,7 +180,7 @@ function onStateChanged(add, remove, state, metadata) {
  * @param {!Array.<gapi.hangout.Participant>} participants The new list of
  *     participants.
  */
-function onParticipantsChanged(participants) {
+function updateLocalParticipants(participants) {
   participants_ = participants;
   setAvatars();
 }
@@ -275,16 +274,16 @@ Avatar.deserialize = function(serializedForm) {
 function getAvatarChoices() {
   var imageHost = '//hangoutsapi.appspot.com/static/talkinghead';
   var android = new Avatar({
-      'id': 'android',
-      'name': 'Android',
-      'restUrl': imageHost + '/android_logo_closed.png',
-      'talkUrl': imageHost + '/android_logo_open.png'
+    'id': 'android',
+    'name': 'Android',
+    'restUrl': imageHost + '/android_logo_closed.png',
+    'talkUrl': imageHost + '/android_logo_open.png'
   });
   var androidBlue = new Avatar({
-      'id': 'androidBlue',
-      'name': 'Android Blue',
-      'restUrl': imageHost + '/android_blue_closed.png',
-      'talkUrl': imageHost + '/android_blue_open.png'
+    'id': 'androidBlue',
+    'name': 'Android Blue',
+    'restUrl': imageHost + '/android_blue_closed.png',
+    'talkUrl': imageHost + '/android_blue_open.png'
   });
 
   return [android, androidBlue];
@@ -402,33 +401,33 @@ function setAvatars() {
 
   for (var i = 0, iLen = participants_.length; i < iLen; ++i) {
     var p = participants_[i];
-    var isCurrentUser = p.hangoutId === getUserHangoutId();
+    var isCurrentUser = p.id === getUserHangoutId();
     var clearSelected = false, setSelected = false;
-    if (avatarMap_[p.hangoutId]) {
-      var avatar = avatarMap_[p.hangoutId];
+    if (avatarMap_[p.id]) {
+      var avatar = avatarMap_[p.id];
       if (!avatar.isSet) {
         clearSelected = setSelected = isCurrentUser;
 
         avatar.talkHandler =
-            createSetAvatarHandler(p.hangoutId, true, avatar.getTalkUrl());
+            createSetAvatarHandler(p.id, true, avatar.getTalkUrl());
         avatar.quietHandler =
-            createSetAvatarHandler(p.hangoutId, false, avatar.getRestUrl());
+            createSetAvatarHandler(p.id, false, avatar.getRestUrl());
         avatar.isSet = true;
         avatar.quietHandler();
 
         if (DEBUG) {
           var tdKey = $('<td />')
-              .text(p.hangoutId);
+              .text(p.id);
           var tdVal = $('<td />').text(avatar.toString());
           var tr = $('<tr />')
-              .attr('id', p.hangoutId)
+              .attr('id', p.id)
               .append(tdKey, tdVal);
           table.append(tr);
         }
       }
     } else {
       // If the avatar is currently set, remove it.
-      gapi.hangout.av.clearAvatar(p.hangoutId);
+      gapi.hangout.av.clearAvatar(p.id);
       clearSelected = isCurrentUser;
     }
     if (clearSelected) {
@@ -469,7 +468,7 @@ function onVolumeLevelsChanged(volumes) {
     return;
   }
   for (var i = 0, iLen = participants_.length; i < iLen; ++i) {
-    var hangoutId = participants_[i].hangoutId;
+    var hangoutId = participants_[i].id;
     var level = volumes[hangoutId] || 0;
     var avatar = avatarMap_[hangoutId];
     if (avatar && avatar.talkHandler && avatar.quietHandler) {
@@ -492,42 +491,50 @@ function onVolumeLevelsChanged(volumes) {
 (function() {
   if (gapi && gapi.hangout) {
 
-    var initHangout = function() {
-      prepareAppDOM();
+    var initHangout = function(apiReadyEvent) {
+      if (apiReadyEvent.isApiReady) {
+        prepareAppDOM();
 
-      gapi.hangout.data.addStateChangeListener(onStateChanged);
-      gapi.hangout.addParticipantsListener(onParticipantsChanged);
+        gapi.hangout.data.onStateChanged.add(function(stateChangeEvent) {
+          updateLocalStateData(stateChangeEvent.addedKeys,
+                               stateChangeEvent.removedKeys);
+        });
+        gapi.hangout.onParticipantsChanged.add(function(partChangeEvent) {
+          updateLocalParticipants(partChangeEvent.participants);
+        });
 
-      populateAvatarChoices(getAvatarChoices());
+        populateAvatarChoices(getAvatarChoices());
 
-      if (!participants_) {
-        var initParticipants = gapi.hangout.getParticipants();
-        if (initParticipants) {
-          onParticipantsChanged(initParticipants);
-        }
-      }
-      if (!avatarMap_) {
-        var initState = gapi.hangout.data.getState();
-        var initMetadata = gapi.hangout.data.getStateMetadata();
-        // Since this is the first push, added has all the values in metadata in
-        // Array form.
-        var added = [];
-        for (var key in initMetadata) {
-          if (initMetadata.hasOwnProperty(key)) {
-            added.push(initMetadata[key]);
+        if (!participants_) {
+          var initParticipants = gapi.hangout.getParticipants();
+          if (initParticipants) {
+            updateLocalParticipants(initParticipants);
           }
         }
-        var removed = [];
-        if (initState && initMetadata) {
-          onStateChanged(added, removed, initState, initMetadata);
+        if (!avatarMap_) {
+          var initMetadata = gapi.hangout.data.getStateMetadata();
+          if (initMetadata) {
+            // Since this is the first push, added has all the values in
+            // metadata in Array form.
+            var added = [];
+            for (var key in initMetadata) {
+              if (initMetadata.hasOwnProperty(key)) {
+                added.push(initMetadata[key]);
+              }
+            }
+            var removed = [];
+            updateLocalStateData(added, removed);
+          }
         }
+
+        gapi.hangout.av.onVolumesChanged.add(function(volChangeEvent) {
+          onVolumeLevelsChanged(volChangeEvent.volumes);
+        });
+
+        gapi.hangout.onApiReady.remove(initHangout);
       }
-
-      gapi.hangout.av.addVolumesChangedListener(onVolumeLevelsChanged);
-
-      gapi.hangout.removeApiReadyListener(initHangout);
     };
 
-    gapi.hangout.addApiReadyListener(initHangout);
+    gapi.hangout.onApiReady.add(initHangout);
   }
 })();

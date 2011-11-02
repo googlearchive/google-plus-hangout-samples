@@ -12,7 +12,7 @@
  * or implied. See the License for the specific language governing permissions and limitations under
  * the License.
  */ -->
-<Module>
+
 <Module>
   <ModulePrefs title="Yes/No/Maybe" height="100" width="550">
   <Require feature="dynamic-height"/>
