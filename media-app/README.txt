@@ -4,7 +4,7 @@ If you're reading this, you've probably taken a look at the Hangouts API
 reference docs and want to get started creating your own hangout app. 
 
 We suggest you get the Starter App up and running before you tackle
-this one!x
+this one!
 
 == What's Included ==
 This project provides:
@@ -25,7 +25,7 @@ hangout app.
 
 You need to host all of the files statically on a publicly-visible
 website.  Right now, it all points to hangoutmediastarter.appspot.com,
-so if you wish to modify it.
+so you may wish to edit those links.
 
 If you modify the js, you need to change mediaStarter.xml to point to
 your local .js file (not the one on hangoutmediastarter.appspot.com).
