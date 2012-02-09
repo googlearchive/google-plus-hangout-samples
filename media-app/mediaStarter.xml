@@ -44,7 +44,7 @@ charset = iso - 8859 - 1 " />
 
 <body>
 
-<script src="https://hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=0.1" ></script>
+<script src="https://hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=0.2" ></script>
 <script src="https://hangoutmediastarter.appspot.com/static/html5slider.js"></script>
 
 <center>

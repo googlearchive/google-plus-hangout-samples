@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2011 Google Inc. All Rights Reserved -->
+<!-- Copyright 2011-2012 Google Inc. All Rights Reserved -->
 <Module>
   <ModulePrefs title="Talking Head" height="200" width="550">
   <Require feature="dynamic-height"/>
@@ -9,7 +9,7 @@
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
   <script type="text/javascript">google.load("jquery", "1.4.1");</script>
   <script type="text/javascript"
-    src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=0.1"></script>
+    src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=0.2"></script>
 
   <script type="text/javascript"
     src="//hangoutsapi.appspot.com/ggs/talkinghead.js"></script>
