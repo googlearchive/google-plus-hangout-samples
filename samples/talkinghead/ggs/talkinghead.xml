@@ -9,10 +9,10 @@
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
   <script type="text/javascript">google.load("jquery", "1.4.1");</script>
   <script type="text/javascript"
-    src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=0.2"></script>
+    src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.0"></script>
 
   <script type="text/javascript"
-    src="//hangoutsapi.appspot.com/ggs/talkinghead.js"></script>
+    src="//plushangoutstartershadow.appspot.com/ggs/talkinghead.js"></script>
   <link type="text/css" rel="stylesheet"
     href="//hangoutsapi.appspot.com/static/talkinghead/style.css" />
 
