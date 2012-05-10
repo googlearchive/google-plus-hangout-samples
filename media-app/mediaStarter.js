@@ -32,7 +32,13 @@ function showNothing() {
  */
 function onSetScale(value) {
   scaleTxt.innerHTML = parseFloat(value).toFixed(2);
-  overlays[currentItem].setScale(parseFloat(value));
+
+  if (currentItem == 'fancy') {
+    overlays[currentItem].setScale(parseFloat(value),
+        gapi.hangout.av.effects.ScaleReference.WIDTH);
+  } else {
+    overlays[currentItem].setScale(parseFloat(value));
+  }
 }
 
 /** Responds to offset slider
@@ -42,7 +48,12 @@ function onSetOffset(value) {
   console.log('Setting ' + value);
 
   offsetTxt.innerHTML = parseFloat(value).toFixed(2);
-  overlays[currentItem].setOffset(0, parseFloat(value));
+
+  if (currentItem == 'fancy') {
+    overlays[currentItem].setPosition(0, parseFloat(value));
+  } else {
+    overlays[currentItem].setOffset(0, parseFloat(value));
+  }
 }
 
 function setControlVisibility(val) {
@@ -53,21 +64,53 @@ function setControlVisibility(val) {
   }
 }
 
-/** Resets the controls for each type of wearable item */
-function updateControls() {
+function updateOverlayControls() {
   var overlay = overlays[currentItem];
   var min = minScale[currentItem];
   var max = maxScale[currentItem];
 
-  document.getElementById('scaleSlider').value = overlay.getScale();
+  // Overlays magnitude and which dimension of the screen to return
+  var scale = overlay.getScale().magnitude;
+
+  document.getElementById('scaleSlider').value = scale;
   document.getElementById('scaleSlider').min = min;
   document.getElementById('scaleSlider').max = max;
   document.getElementById('scaleTxt').innerHTML =
-      overlay.getScale().toFixed(2);
+      scale.toFixed(2);
+
+  document.getElementById('offsetSlider').value = overlay.getPosition().y;
+  document.getElementById('offsetTxt').innerHTML =
+      overlay.getPosition().y.toFixed(2);
+}
+
+function updateFaceTrackingOverlayControls() {
+  var overlay = overlays[currentItem];
+  var min = minScale[currentItem];
+  var max = maxScale[currentItem];
+
+  // FaceTrackingOverlays return only magnitude
+  var scale = overlay.getScale();
+
+  document.getElementById('scaleSlider').value = scale;
+  document.getElementById('scaleSlider').min = min;
+  document.getElementById('scaleSlider').max = max;
+  document.getElementById('scaleTxt').innerHTML =
+      scale.toFixed(2);
 
   document.getElementById('offsetSlider').value = overlay.getOffset().y;
   document.getElementById('offsetTxt').innerHTML =
       overlay.getOffset().y.toFixed(2);
+}
+
+
+/** Resets the controls for each type of wearable item */
+function updateControls() {
+  // Don't show these controls for
+  if (currentItem == 'fancy') {
+    updateOverlayControls();
+  } else {
+    updateFaceTrackingOverlayControls();
+  }
 }
 
 /** For removing every overlay */
@@ -75,6 +118,33 @@ function hideAllOverlays() {
   for (var index in overlays) {
     overlays[index].setVisible(false);
   }
+}
+
+function createTextOverlay(string) {
+  // Create a canvas to draw on
+  var canvas = document.createElement('canvas');
+  canvas.setAttribute('width', 166);
+  canvas.setAttribute('height', 100);
+  
+  var context = canvas.getContext('2d');
+
+  // Draw background
+  context.fillStyle = '#BBB';
+  context.fillRect(0,0,166,50);
+
+  // Draw text
+  context.font = '32pt Impact';
+  context.lineWidth = 6;
+  context.lineStyle = '#000';
+  context.fillStyle = '#FFF';
+  context.fillColor = '#ffff00';
+  context.fillColor = '#ffff00';
+  context.textAlign = 'center';
+  context.textBaseline = 'bottom';
+  context.strokeText(string, canvas.width / 2, canvas.height / 2);
+  context.fillText(string, canvas.width / 2, canvas.height / 2);
+
+  return canvas.toDataURL();
 }
 
 /** Initialize our constants, build the overlays */
@@ -109,6 +179,19 @@ function createOverlays() {
        'rotateWithFace': true});
   minScale['stache'] = 0.65;
   maxScale['stache'] = 2.5;
+
+  var fancy = gapi.hangout.av.effects.createImageResource(
+      createTextOverlay('Hello!'));
+  // Create this non-moving overlay that will be 100% of the width
+  // of the video feed.
+  overlays['fancy'] = fancy.createOverlay(
+      {'scale':
+       {'magnitude': 0.5,
+        'reference': gapi.hangout.av.effects.ScaleReference.WIDTH}});
+  // Put the text x-centered and near the bottom of the frame
+  overlays['fancy'].setPosition(0, 0.45);
+  minScale['fancy'] = 1.0;
+  maxScale['fancy'] = 2.5;
 }
 
 createOverlays();
@@ -123,7 +206,7 @@ var gooddaySound = gapi.hangout.av.effects.createAudioResource(
 
 function sayGoodDay() {
   // There can only be one active resource, Audio or Image.
-  // By playing the sound, we activate this resource 
+  // By playing the sound, we activate this resource
   // and will automatically hide all the other overlays.
   // Thus, we hide the scaling controls.
   setControlVisibility(false);
@@ -165,10 +248,10 @@ function onStateChanged(event) {
 
 function init() {
   gapi.hangout.onApiReady.add(function(eventObj) {
-      if (eventObj.isApiReady) {
-        gapi.hangout.data.onStateChanged.add(onStateChanged);
-      }
-    });
+    if (eventObj.isApiReady) {
+      gapi.hangout.data.onStateChanged.add(onStateChanged);
+    }
+  });
 }
 
 gadgets.util.registerOnLoadHandler(init);

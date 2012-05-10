@@ -44,7 +44,7 @@ charset = iso - 8859 - 1 " />
 
 <body>
 
-<script src="https://hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.0" ></script>
+<script src="https://hangoutsapi.talkgadget.google.com/hangouts/_/api/hangout.js?v=1.1" ></script>
 <script src="https://hangoutmediastarter.appspot.com/static/html5slider.js"></script>
 
 <center>
@@ -66,6 +66,10 @@ charset = iso - 8859 - 1 " />
 
 <input class="button" type="button" value="Mustache!" id="mustacheButton"
 	    onClick="showOverlay('stache')"/>
+	    
+<input class="button" type="button" value="Fancy!" id="mustacheButton"
+        onClick="showOverlay('fancy')"/>
+        
 
 <input class="button" type="button" value="Nothing." id="nothingButton"
 			    onClick="showNothing()"/>
@@ -85,9 +89,7 @@ charset = iso - 8859 - 1 " />
 
 </center>
 
-
-
-<script src="https://hangoutmediastarter.appspot.com/static/mediaStarter.js"></script>
+<script src="https://plushangoutstarter.appspot.com/static/mediaStarter.js"></script>
 
 ]]>
 </Content>
