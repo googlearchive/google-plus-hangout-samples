@@ -76,10 +76,10 @@
         In this data model, you can send rapid, small updates to other participants running the same 
         application.  We are <i>not</i> using shared state.</p>
         
-        <p>Mousing over the grid will use <tt>sendMessage</tt> it indicate which square you are over and what color you have chosen.</p>
+        <p>Mousing over the grid will use <tt>sendMessage</tt> to indicate which square you are over and what color you have chosen.</p>
 
-        <p>Note that some messages may be dropped, especially if your application sends lots of them at once.  This app is locked
-        at 30 messages per second at the most to avoid overloading the channel.</p>
+        <p>Note that some messages may be dropped, especially if your application sends lots of them at once.  This app is locked to a maximum of
+        30 messages per second to avoid overloading the channel.</p>
     </div>
 </div>
 
