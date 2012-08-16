@@ -10,6 +10,8 @@ var overlays = [];
 var minScale = [];
 var maxScale = [];
 
+var keepAnimating = false;
+
 /** Responds to buttons
  * @param {string} name Item to show.
  */
@@ -22,7 +24,7 @@ function showOverlay(name) {
 }
 
 function showNothing() {
-  currentTime = null;
+  currentItem = null;
   hideAllOverlays();
   setControlVisibility(false);
 }
@@ -118,6 +120,8 @@ function hideAllOverlays() {
   for (var index in overlays) {
     overlays[index].setVisible(false);
   }
+  disposeArbitraryOverlay();
+  keepAnimating = false;
 }
 
 function createTextOverlay(string) {
@@ -194,6 +198,87 @@ function createOverlays() {
   maxScale['fancy'] = 2.5;
 }
 
+// Arbitray overlay
+var arbitraryResource = null;
+var arbitraryOverlay = null;
+
+function disposeArbitraryOverlay() {
+    if (arbitraryResource) {
+	arbitraryResource.dispose();
+	arbitraryResource = null;
+    }
+}
+
+function loadOverlay(uri) {
+    showNothing();
+    
+    arbitraryResource = gapi.hangout.av.effects.createImageResource(
+	uri);
+
+    // Use an onLoad handler 
+    arbitraryResource.onLoad.add( function(event) {
+	if ( !event.isLoaded ) {
+	    alert("We could not load your overlay.");
+	} else {
+	    alert("We loaded your overlay.");
+	}
+    });
+
+    // Create this non-moving overlay that will be 50% of the width
+    // of the video feed.
+    arbitraryOverlay = arbitraryResource.createOverlay(
+	{'scale':
+	 {'magnitude': 0.5,
+          'reference': gapi.hangout.av.effects.ScaleReference.WIDTH}});
+    // Put the text x-centered and halfway down the frame
+    arbitraryOverlay.setPosition(0, 0.25);
+    arbitraryOverlay.setVisible(true);
+}
+
+
+// Animated
+var frameCount = 0;
+
+var animatedResource = null;
+var animatedOverlay = null;
+
+function updateAnimatedOverlay(time) {  
+    var oldResource = animatedResource;
+    var oldOverlay = animatedOverlay;
+
+    animatedResource = gapi.hangout.av.effects.createImageResource(
+	createTextOverlay('Tick: ' + frameCount));
+    // Create this non-moving overlay that will be 50% of the width
+    // of the video feed.
+    animatedOverlay = animatedResource.createOverlay(
+	{'scale':
+	 {'magnitude': 0.5,
+          'reference': gapi.hangout.av.effects.ScaleReference.WIDTH}});
+    // Put the text x-centered and near the bottom of the frame
+    animatedOverlay.setPosition(0, 0.45);
+    animatedOverlay.setVisible(true);
+
+    if (oldResource) {
+	// This will also dispose of the related overlay.
+	oldResource.dispose();
+	oldResource = null;
+    }
+}
+
+function animLoop() {
+    if (keepAnimating) {
+	window.setTimeout(animLoop, 1000);
+	frameCount++;
+	updateAnimatedOverlay(frameCount);
+    }
+}
+
+function showAnimatedOverlay() {
+    showNothing();
+    keepAnimating = true;
+    animLoop();
+}
+
 createOverlays();
 
 // SOUND
@@ -202,55 +287,18 @@ var gooddaySoundURL =
     'http://hangoutmediastarter.appspot.com/static/goodday.wav';
 
 var gooddaySound = gapi.hangout.av.effects.createAudioResource(
-    gooddaySoundURL).createSound();
+    gooddaySoundURL).createSound({loop: false, localOnly: false});
 
+// Note that we are playing a global audio event,
+// so other hangouts will hear it.
 function sayGoodDay() {
-  // There can only be one active resource, Audio or Image.
-  // By playing the sound, we activate this resource
-  // and will automatically hide all the other overlays.
-  // Thus, we hide the scaling controls.
-  setControlVisibility(false);
-  gooddaySound.play({loop: false});
-}
-
-function emitGoodDayEvent() {
-  // Make an arbitrary change to the shared state.
-  // This will set off an event change, which in turn
-  // will make a noise.  If two people are mashing the button
-  // at the same time, you might miss a soundplay....and that
-  // would be OK in that situation.
-  var countStr = gapi.hangout.data.getState()['count'];
-
-  if (countStr == null) {
-    count = 0;
-  }
-  else {
-    count = parseInt(countStr) + 1;
-  }
-
-  gapi.hangout.data.submitDelta({'count': '' + count});
-}
-
-function onStateChanged(event) {
-  try {
-    console.log('State changed...');
-    // If the shared state changes with an addition
-    // or modification, make a noise.
-    if (event.addedKeys.length > 0) {
-      console.log('I say good day to you!');
-      sayGoodDay();
-    }
-  } catch (e) {
-    console.log('Fail state changed');
-    console.log(e);
-  }
+    gooddaySound.play();
 }
 
 function init() {
   gapi.hangout.onApiReady.add(function(eventObj) {
-    if (eventObj.isApiReady) {
-      gapi.hangout.data.onStateChanged.add(onStateChanged);
-    }
+    console.log("everything ready");
+    document.querySelector('#fullUI').style.visibility = 'visible';
   });
 }
 

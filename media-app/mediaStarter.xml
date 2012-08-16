@@ -44,16 +44,16 @@ charset = iso - 8859 - 1 " />
 
 <body>
 
-<script src="https://hangoutsapi.talkgadget.google.com/hangouts/_/api/hangout.js?v=1.1" ></script>
+<script src="https://talkgadget.google.com/hangouts/_/api/hangout.js?v=1.2" ></script>
 <script src="https://hangoutmediastarter.appspot.com/static/html5slider.js"></script>
 
 <center>
 
+<div id='fullUI' style='visibility:hidden;'>
 <p>
 <br/>
 <input class="button" type="button" value="Good day!" id="topHatButton"
-    onClick="emitGoodDayEvent()"/>
-
+    onClick="sayGoodDay()"/>
 </p>
 
 <p>
@@ -67,14 +67,16 @@ charset = iso - 8859 - 1 " />
 <input class="button" type="button" value="Mustache!" id="mustacheButton"
 	    onClick="showOverlay('stache')"/>
 	    
-<input class="button" type="button" value="Fancy!" id="mustacheButton"
+<input class="button" type="button" value="Fancy!" id="fancyButton"
         onClick="showOverlay('fancy')"/>
+
+<input class="button" type="button" value="Animated!" id="animatedButton"
+        onClick="showAnimatedOverlay()"/>
         
 
 <input class="button" type="button" value="Nothing." id="nothingButton"
 			    onClick="showNothing()"/>
 </p>
-	
 	
 <div id="overlayControls" style="visibility: hidden">
 
@@ -86,10 +88,25 @@ charset = iso - 8859 - 1 " />
 	<input id="offsetSlider" type="range" min="-0.2" max="0.15" value="0.1" step="0.01"  onchange="onSetOffset(this.value)" />
 	<span id="offsetTxt">0</span>
 </div>
+<br/>
+<div id='arbitraryURILoader'>
+  You can also load any arbitrary PNG.  Enter an URL below.<br/>
+	<input id="loadableURI" type="text" 
+	       placeholder="Enter an image URL that ends in .png"
+	       style="width:300px;"
+	       />
+	<input class="button"
+	       type="button" 
+	       value="Load an overlay" id="animatedButton"
+               onClick="loadOverlay(document.querySelector('#loadableURI').value)"/>
+
+</div>
+
+</div>
 
 </center>
 
-<script src="https://plushangoutstarter.appspot.com/static/mediaStarter.js"></script>
+<script src="https://plushangoutstartershadow.appspot.com/static/mediaStarter.js"></script>
 
 ]]>
 </Content>

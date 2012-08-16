@@ -9,7 +9,7 @@
   <script type="text/javascript" src="//www.google.com/jsapi"></script>
   <script type="text/javascript">google.load("jquery", "1.4.1");</script>
   <script type="text/javascript"
-    src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.0"></script>
+    src="//talkgadget.google.com/hangouts/api/hangout.js?v=1.2"></script>
 
   <script type="text/javascript"
     src="//plushangoutstartershadow.appspot.com/ggs/talkinghead.js"></script>
