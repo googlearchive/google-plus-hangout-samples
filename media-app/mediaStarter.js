@@ -299,10 +299,6 @@ function sayGoodDay() {
 function updateMirroring() {
   var val =  document.querySelector('#mirror-checkbox').checked;
 
-  // Note that this will not happen instantaneously;
-  // there will be a roundtrip to the server.
-  // See:  gapi.hangout.av.onLocalParticipantVideoMirroredChanged
-
   gapi.hangout.av.setLocalParticipantVideoMirrored(val);
 }
 
