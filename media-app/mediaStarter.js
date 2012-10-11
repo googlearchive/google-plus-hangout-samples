@@ -295,6 +295,17 @@ function sayGoodDay() {
     gooddaySound.play();
 }
 
+// Set mirroring and unmirroring
+function updateMirroring() {
+  var val =  document.querySelector('#mirror-checkbox').checked;
+
+  // Note that this will not happen instantaneously;
+  // there will be a roundtrip to the server.
+  // See:  gapi.hangout.av.onLocalParticipantVideoMirroredChanged
+
+  gapi.hangout.av.setLocalParticipantVideoMirrored(val);
+}
+
 function init() {
   gapi.hangout.onApiReady.add(function(eventObj) {
     console.log("everything ready");
