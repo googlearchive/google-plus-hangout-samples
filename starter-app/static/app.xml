@@ -21,7 +21,7 @@
   <Content type="html"><![CDATA[
 <!DOCTYPE html>
 <!-- The hangout API JavaScript. Always include this first -->
-<script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.2"></script>
+<script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.4"></script>
 
 <!-- The JavaScript for this app. This must always be a full URL not a
      relative path.
