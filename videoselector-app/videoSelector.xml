@@ -19,7 +19,7 @@
   <Content type="html">
     <![CDATA[
     
-<script src="//hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.4"></script>
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
 
 <div bgcolor="red" id="whosTalkin"><p>No video feed</p></div>
 	

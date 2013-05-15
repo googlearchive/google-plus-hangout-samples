@@ -38,7 +38,7 @@
 </style>
 <body>
 
-<script src="https://hangoutsapi.talkgadget.google.com/hangouts/api/hangout.js?v=1.4" ></script>
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
 
 <h3>Simple Hangout App</h3>
 
