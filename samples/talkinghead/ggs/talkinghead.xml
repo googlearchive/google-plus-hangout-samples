@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2011-2012 Google Inc. All Rights Reserved -->
+<Module>
+  <ModulePrefs title="Talking Head" height="200" width="550">
+  <Require feature="dynamic-height"/>
+  <Require feature="rpc"/>
+</ModulePrefs>
+<Content type="html"><![CDATA[
+  <script type="text/javascript" src="//www.google.com/jsapi"></script>
+  <script type="text/javascript">google.load("jquery", "1.4.1");</script>
+  <script type="text/javascript"
+    src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+
+  <script type="text/javascript"
+    src="//plushangoutstartershadow.appspot.com/ggs/talkinghead.js"></script>
+  <link type="text/css" rel="stylesheet"
+    href="//hangoutsapi.appspot.com/static/talkinghead/style.css" />
+
+]]></Content>
+</Module>
+

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+<!-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *	
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License
+-->
+  <ModulePrefs title="Video Feed Selector">
+    <Require feature="rpc"/>
+    <Require feature="views"/>
+  </ModulePrefs>
+  <Content type="html">
+    <![CDATA[
+    
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+
+<div bgcolor="red" id="whosTalkin"><p>No video feed</p></div>
+	
+<input type=button value="Show default feed" id="showDefaultFeedButton"
+	onClick="showDefaultFeed()"/>
+
+<div id="participants"><p><i>Participants not available yet.</i></p></div>
+	
+<script>
+
+// Remember some divs for easy reference later.
+var participantsDiv = document.getElementById('participants');
+var whosTalkin = document.getElementById('whosTalkin');
+
+// What ID has the highlight right now?
+var currentHighlightedParticipantId = null;
+
+function getDisplayNameFromId(id) {
+  var participant = gapi.hangout.getParticipantById(id);
+  if (!participant || !participant.hasAppEnabled) {
+    return 'An unknown person';
+  }
+  return participant.person.displayName;
+}
+
+// Updates div to say who is shown in the video canvas
+function updateDisplayedParticipant() {
+  if (currentHighlightedParticipantId) {
+    whosTalkin.innerHTML = '<p>Locked to ' +
+        getDisplayNameFromId(currentHighlightedParticipantId) + '</p>';
+    return;
+  }
+
+  var id = gapi.hangout.layout.getDefaultVideoFeed().getDisplayedParticipant();
+  whosTalkin.innerHTML = '<p>Currently ' +
+      getDisplayNameFromId(id) + '</p>';
+}
+
+// Shows a list of participants with clickable buttons to lock them
+function updateParticipants() {
+  var retVal = '<ul>';
+
+  var participants = gapi.hangout.getParticipants();
+
+  for (var index in participants) {
+    var part = participants[index];
+
+    retVal += '<li>' + getDisplayNameFromId(part.id) +
+        ' <input type="button" value="Lock" id="lockMeButton"' +
+            'onClick="lockParticipant(\'' + part.id + '\')"/></li>';
+  }
+
+  retVal += '</ul>';
+
+  // Check to see if the current participant
+  if (currentHighlightedParticipantId &&
+      !gapi.hangout.getParticipantById(currentHighlightedParticipantId)) {
+    currentHighlightedParticipantId = null;
+    showDefaultFeed();
+  }
+
+  participantsDiv.innerHTML = retVal;
+}
+
+// Displays the video feed that would normally be
+// visible if the app.  The DefaultVideoFeed generally
+// shows feeds based on their volume level.
+function showDefaultFeed() {
+
+  // Remove the highlighting.
+  if (currentHighlightedParticipantId) {
+    gapi.hangout.av.clearAvatar(currentHighlightedParticipantId);
+  }
+
+  currentHighlightedParticipantId = null;
+
+  var feed = gapi.hangout.layout.getDefaultVideoFeed();
+  var canvas = gapi.hangout.layout.getVideoCanvas();
+
+  canvas.setVideoFeed(feed);
+  canvas.setWidth(600);
+  canvas.setPosition(300, 50);
+  canvas.setVisible(true);
+
+  // Update the text
+  updateDisplayedParticipant();
+}
+
+// Displays the video feed for a given participant
+function lockParticipant(partId) {
+
+  // Remove any previous highlighting.
+  if (currentHighlightedParticipantId) {
+    gapi.hangout.av.clearAvatar(currentHighlightedParticipantId);
+  }
+
+  // Remember who is selected
+  currentHighlightedParticipantId = partId;
+  // Highlight this user with the red rectangle.
+  gapi.hangout.av.setAvatar(currentHighlightedParticipantId,
+      'http://mediakit001.appspot.com/static/images/participantHighlight.png');
+
+  // Set the feed
+  var feed = gapi.hangout.layout.createParticipantVideoFeed(partId);
+  var canvas = gapi.hangout.layout.getVideoCanvas();
+
+  canvas.setVideoFeed(feed);
+  canvas.setWidth(600);
+  canvas.setPosition(300, 50);
+  canvas.setVisible(true);
+
+  // Update the text
+  updateDisplayedParticipant();
+}
+
+// This runs when the gadget is ready
+function init() {
+  console.log('Init.');
+
+  // When API is ready...
+  gapi.hangout.onApiReady.add(
+      function(eventObj) {
+        if (eventObj.isApiReady) {
+          console.log('API is ready');
+          updateParticipants();
+          updateDisplayedParticipant();
+          
+          // Add some listeners
+
+          // When people leave the hangout
+          gapi.hangout.onParticipantsChanged.add(
+              function(eventObj) {
+                console.log('Participants changed');
+                updateParticipants();
+              });
+
+          // Every time the default video feed changes, we want the text to change
+          // Note that these events go off whether or not the default video feed
+          // is currently displayed.
+          gapi.hangout.layout.getDefaultVideoFeed().onDisplayedParticipantChanged.add(
+              function(eventObj) {
+                console.log('Displayed participant changed');
+                updateDisplayedParticipant();
+              });
+         
+        }
+      });
+}
+
+// Wait for gadget to load.
+gadgets.util.registerOnLoadHandler(init);
+
+
+</script>
+    ]]>
+  </Content>
+</Module>
