@@ -1,0 +1,282 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Module>
+<!-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *	
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License
+-->
+	<ModulePrefs title="Send Message">
+		<Require feature="rpc" />
+		<Require feature="views" />
+		<Require feature="locked-domain" />
+	</ModulePrefs>
+	<Content type="html"><![CDATA[     
+
+<html>
+<style type="text/css">
+<!--
+.button {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+  background: -moz-linear-gradient(top, #fff, #ddd);  
+  border: 1px solid #bbb;
+}
+.button:active {
+	background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#333)); 
+	background: -moz-linear-gradient(bottom, #ddd, #aaa); }
+#wrap {
+    width:800px;
+    margin:0 auto;
+    background:#EEEEEE;
+}   
+#main {
+    float:left;
+    width:300px;
+    margin:0 auto;
+    background:#FFFFFF;
+}
+#text {
+    float:right;
+    width:400px;
+    margin-left:20px;
+    background:#FFFFFF;
+}
+
+-->
+</style>
+
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+
+<div id="wrap">
+    <h2>Message Event Channel Demo</h2>
+    <div id="main">
+        <canvas id="canvas" width='300' height='300'></canvas><br/>
+
+            <p>Choose a color: <span style="width:50px;height:50px;border:1px solid #000; background:#0F0" onClick='setColor("#0F0")'>G</span>
+            <span style="width:50px;height:50px;border:1px solid #000; background:#F00" onClick='setColor("#F00")'>R</span>
+            <span style="width:50px;height:50px;border:1px solid #000; background:#00F" onClick='setColor("#00F")'>B</span>
+            <span style="width:50px;height:50px;border:1px solid #000; background:#FFF" onClick='setColor("#FFF")'>W</span></p>
+
+        <div id="eventsSent"></div><br/>
+
+        <input type='button' class='button' value='Reset picture' onClick='initColorBoxes()'></input>
+    </div>
+    <div id='text'>
+        <h2>What am I seeing?</h2>
+
+        <p>This application demonstrates the Hangouts API <b>message data channel</b>.  
+        In this data model, you can send rapid, small updates to other participants running the same 
+        application.  We are <i>not</i> using shared state.</p>
+        
+        <p>Mousing over the grid will use <tt>sendMessage</tt> to indicate which square you are over and what color you have chosen.</p>
+
+        <p>Note that some messages may be dropped, especially if your application sends lots of them at once.  This app is locked to a maximum of
+        30 messages per second to avoid overloading the channel.</p>
+    </div>
+</div>
+
+<script>
+// Keep track of how many messages were sent
+var messageLastSeen = {};
+var myMessageCount = 0;
+var missedMessages = 0;
+
+// Various constants for width and height
+var tileSide = 10;
+var pixelWidth = 300;
+var pixelHeight = 300;
+var tileWidth = pixelWidth / tileSide;
+var tileHeight = pixelHeight / tileSide;
+
+// Holds all our tile colors
+var tileColor = [];
+
+// Current drawing color
+var currentColor = '#F00';
+
+var canvas = document.getElementById('canvas');
+
+/** Button callback for selecting a color
+ * @param {string} value a hex color.
+ */
+function setColor(value) {
+    currentColor = value;
+}
+
+// Keep track of where the mouse is and whether it's moved across a grid.
+var mouseDirty = false;
+var lastTileX, lastTileY;
+
+/** Draws the tile grid.
+ * @param {context} context a canvas 2d context.
+ */
+function render(context) {
+  context.fillStyle = '#000';
+  context.fillRect(0, 0, pixelWidth, pixelHeight);
+
+  for (var j = 0; j < tileWidth; j++) {
+    for (var i = 0; i < tileHeight; i++) {
+      var color = tileColor[i][j];
+
+      context.fillStyle = color;
+      context.fillRect(i * tileSide + 1,
+                       j * tileSide + 1,
+                       tileSide - 2,
+                       tileSide - 2);
+    }
+  }
+}
+
+/** Move mouse
+ * @param {number} x x coordinate.
+ * @param {number} y y coordinate.
+ */
+function mouseMove(x, y) {
+    // Only one update per frame.
+    if (mouseDirty) {
+        return;
+    }
+
+    var tileX = Math.floor(x / tileSide);
+    var tileY = Math.floor(y / tileSide);
+
+    mouseDirty = (tileX != lastTileX || tileY != lastTileY);
+
+    // Only color if you've moved a significant amount.
+    if (mouseDirty) {
+        tileColor[tileX][tileY] = currentColor;
+
+        lastTileX = tileX;
+        lastTileY = tileY;
+    }
+}
+
+/** Standard requestAnimFrame; see paulirish.com */
+window.requestAnimFrame = (
+    function(callback) {
+      return window.requestAnimationFrame ||
+          window.webkitRequestAnimationFrame ||
+          window.mozRequestAnimationFrame ||
+          window.oRequestAnimationFrame ||
+          window.msRequestAnimationFrame ||
+          function(callback) {
+            window.setTimeout(callback, 1000 / 30);
+          };
+    })();
+
+/** Draw canvas once per frame. */
+function animate() {
+  // draw
+  var canvas = document.getElementById('canvas');
+
+  render(canvas.getContext('2d'));
+  // request new frame
+  requestAnimFrame(function() {
+    animate();
+    // Send a message if you've moved.
+    if (mouseDirty) {
+      myMessageCount++;
+      gapi.hangout.data.sendMessage(
+          JSON.stringify([myMessageCount,
+                          currentColor,
+                          lastTileX,
+                          lastTileY]));
+      mouseDirty = false;
+    }
+  });
+}
+
+/** Builds our grid of colors */
+function initColorBoxes() {
+  tileColor = [];
+  for (var i = 0; i < tileWidth; i++) {
+    var row = [];
+    for (var j = 0; j < tileHeight; j++) {
+      row.push('#FFF');
+    }
+    tileColor.push(row);
+  }
+}
+
+/** Draw missing packets, if packets are missing. */
+function showLossRates() {
+  var div = document.getElementById('eventsSent');
+  var retVal = 'Missed messages: ' + missedMessages;
+
+  div.innerHTML = retVal;
+}
+
+var missedPackets = 0;
+
+/** Count any dropped packages.  Compare incoming message count
+ * to the number of messages we've seen; any discrepancy counts
+ * as one miss.
+ * @param {string} senderid Participant id of sender.
+ * @param {number} messageid last number send.
+ */
+function droppedPackageCount(senderid, messageid) {
+  if (messageLastSeen[senderid] != messageid - 1) {
+    missedPackets++;
+  }
+  messageLastSeen[senderid] = messageid;
+
+  console.log('message id = ' + messageid);
+}
+
+/** Get a message.
+ * @param {MessageReceievedEvent} event An event.
+ */
+function onMessageReceived(event) {
+  try {
+    var data = JSON.parse(event.message);
+
+    tileColor[data[2]][data[3]] = data[1];
+    droppedPackageCount(event.senderId, parseInt(data[0]));
+    showLossRates();
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+/** Kick off the app. */
+function init() {
+  // When API is ready...
+  gapi.hangout.onApiReady.add(
+      function(eventObj) {
+        if (eventObj.isApiReady) {
+          try {
+            gapi.hangout.data.onMessageReceived.add(onMessageReceived);
+
+            document.getElementById('canvas').onmousemove = function(e) {
+              var ev = e || window.event;
+              mouseMove(ev.clientX - canvas.offsetLeft,
+                        ev.clientY - canvas.offsetTop);
+            };
+
+            initColorBoxes();
+            animate();
+          } catch (e) {
+            console.log('init:ERROR');
+            console.log(e);
+          }
+        }
+      });
+}
+
+
+// Wait for gadget to load.                                                       
+gadgets.util.registerOnLoadHandler(init);
+</script>
+</body>
+]]>
+</Content>
+</Module>
+

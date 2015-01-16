@@ -1,0 +1,223 @@
+<!-- 
+
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ 
+ * http://www.apache.org/licenses/LICENSE-2.0
+	
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License
+-->
+
+<!-- This example uses hangoutiframer.  See
+     http://hangoutiframer.appspot.com for further details. -->
+
+<!-- Standard boilerplate to start hangouts.  Without these, your Hangout will not start. -->
+<script src="//hangoutsapi.talkgadget.google.com/talkgadget/apps/gadgets/js/rpc.js"></script>
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+
+<style type="text/css">
+<!--
+.button {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#ddd));
+  background: -moz-linear-gradient(top, #fff, #ddd);  
+  border: 1px solid #bbb;
+}
+
+.button:active {
+background: -webkit-gradient(linear, left top, left bottom, from(#aaa), to(#333)); 
+background: -moz-linear-gradient(bottom, #ddd, #aaa); }
+
+-->
+</style>
+<body style="padding: 10px">
+    
+<h3>On Air Sample (hangoutiframer edition)</h3>
+
+<p>
+  Is On Air: 
+  <b><span id='isOnAir'>undefined</span></b><br/>
+ 
+  Topic:
+  <b><span id='topic'>undefined</span></b>
+</p>
+
+<div id='onAirStats' style="visibility:hidden;">
+  YouTube Live Id:
+  <b><span id='youTubeLiveId'>undefined</span></b>
+  <br/>
+
+  Is broadcaster:
+  <b><span id='isBroadcaster'>undefined</span></b>
+  <br/>
+  
+  <p>
+    <input type="checkbox"
+           visibility="hidden"
+	   id="showParticipants"
+	   onClick="toggleNewParticipantInBroadcast()">Toggle New Participants In Broadcast
+    </input>: 
+
+    <b><span id='newParticipantsInBroadcast'></span></b><br/>
+    <i>This value says whether any new participants joining this HOA will be automatically in the broadcast.</i>
+  </p>
+</div>
+  
+<div id="participantsDiv"></div>
+
+<p id='notOnAir' style="visibility:hidden;">This Hangout is not on air.  Please run this sample in a <b>Hangout On Air</b> to see all its features.</p>
+
+<hr>
+
+<p><a href="http://developers.google.com/+/hangouts/getting-started">Read the docs</a>
+to learn more about developing Hangouts!</a></p>
+
+<script>
+// Updates basic Hangout stats.
+function refreshHangoutStats() {
+  document.querySelector('#isOnAir').innerHTML =
+      gapi.hangout.onair.isOnAirHangout();
+  document.querySelector('#topic').innerHTML = gapi.hangout.getTopic();
+}
+
+// Updates stats specific to HOA.
+function refreshOnAirStats() {
+  if (!gapi.hangout.onair.isOnAirHangout()) {
+    document.querySelector('#notOnAir').style.visibility = 'visible';
+    document.querySelector('#showParticipants').style.visibility = 'hidden';
+    document.querySelector('#onAirStats').style.visibility = 'hidden';
+  } else {
+    document.querySelector('#showParticipants').style.visibility = 'visible';
+    document.querySelector('#notOnAir').style.visibility = 'hidden';
+    document.querySelector('#onAirStats').style.visibility = 'visible';
+    document.querySelector('#youTubeLiveId').innerHTML =
+        gapi.hangout.onair.getYouTubeLiveId();
+    document.querySelector('#newParticipantsInBroadcast').innerHTML =
+        gapi.hangout.onair.isNewParticipantInBroadcast();
+    document.querySelector('#isBroadcaster').innerHTML =
+        gapi.hangout.getLocalParticipant().isBroadcaster;
+  }
+}
+
+// Creates a list of participants and buttons to toggle
+// whether they appear in the broadcast or not.
+function refreshParticipants() {
+  if (!gapi.hangout.onair.isOnAirHangout()) {
+    console.log("is not OnAir Hangout");
+    return;
+  }
+
+  var participants = gapi.hangout.getParticipants();
+
+  var retVal = '<p>Participant in broadcast? </p><ul>';
+
+  for (var index in participants) {
+    var participant = participants[index];
+
+    retVal += '<li>' + participant.person.displayName +
+        '<input type="button" class="button"' + 
+        'value="is in broadcast" ' +
+        'onClick="toggleParticipantInBroadcast(\'' +
+        participant.id + '\')">:  <span id="' +
+        participant.id + '">' +
+        participant.isInBroadcast +
+        '</span></li>';
+  }
+
+  retVal += '</ul>';
+
+  var div = document.getElementById('participantsDiv');
+
+  div.innerHTML = retVal;
+}
+
+// Moves a participant in or out of the broadcast.  Note
+// that we do not update the UI to indicate the participant
+// is in or out until we get the onParticipantsChanged event.
+function toggleParticipantInBroadcast(id) {
+  gapi.hangout.onair.setParticipantInBroadcast(
+      id,
+      !gapi.hangout.getParticipantById(id).isInBroadcast);
+  document.querySelector('#' + id).innerHTML = 'setting...';
+}
+
+// Toggles whether any new participant who joins this Hangout
+// On Air will immediately appear in the broadcast, or whether
+// they will join with video and audio muted.
+function toggleNewParticipantInBroadcast() {
+  gapi.hangout.onair.setNewParticipantInBroadcast(
+      !gapi.hangout.onair.isNewParticipantInBroadcast());
+}
+
+// Any change to isNewParticipantInBroadcast requires a
+// roundtrip to the server, so we need a listener for it.
+function onNewParticipantsInBroadcastChanged(eventObject) {
+  console.log('npib changed: ' + eventObject.value);
+  refreshOnAirStats();
+}
+
+// Kicks off app and attaches all listeners.
+function startApp() {
+  document.getElementById('showParticipants')
+      .style.visibility = 'visible';
+
+  gapi.hangout.onair.onYouTubeLiveIdReady.add(
+      function(eventObject) {
+        refreshOnAirStats();
+        refreshParticipants();
+      });
+
+  gapi.hangout.onParticipantsChanged.add(
+      function(eventObject) {
+        refreshParticipants();
+  });
+
+  gapi.hangout.onair.onBroadcastingChanged.add(
+      function(eventObject) {
+        refreshOnAirStats();
+      });
+
+  gapi.hangout.onair.onNewParticipantInBroadcastChanged.add(
+      function(eventObject) {
+        console.log('Event');
+        console.log(eventObject);
+        refreshOnAirStats();
+      });
+
+  gapi.hangout.onTopicChanged.add(
+      function(eventObject) {
+        console.log('Topic changed');
+        refreshHangoutStats();
+      });
+
+  gapi.hangout.onTopicChanged.add(
+      function(eventObject) {
+        console.log('Topic changed');
+        refreshHangoutStats();
+      });
+
+  // Makes values visible as soon as the API is ready.
+  refreshOnAirStats();
+  refreshHangoutStats();
+  refreshParticipants();
+}
+
+
+function init() {
+  gapi.hangout.onApiReady.add(
+      function(eventObj) {
+        startApp();
+      });
+}
+
+// Add API listener immediately.  If you need an
+// OAuth 2.0 access token, your startup will need to
+// be different.
+init();
+</script>

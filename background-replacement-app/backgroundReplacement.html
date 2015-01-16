@@ -1,0 +1,156 @@
+<!-- 
+
+ * Licensed under the Apache License, Version 2.0 (the "License"); you
+ * may not use this file except in compliance with the License. You
+ * may obtain a copy of the License at
+ 
+ * http://www.apache.org/licenses/LICENSE-2.0
+	
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License
+-->
+
+<!-- This example uses hangoutiframer.  See
+     http://hangoutiframer.appspot.com for further details. -->
+
+<!-- Standard boilerplate to start hangouts.  Without these, your Hangout will not start. -->
+<script src="//hangoutsapi.talkgadget.google.com/talkgadget/apps/gadgets/js/rpc.js"></script>
+<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
+
+<body style="padding: 10px">
+    
+<h3>Background Replacement Sample (hangoutiframer edition)</h3>
+
+<div id="replacementControls">
+  <button id="replace">Replace my background!</button>
+  <button id="disableRep" style="display: none;">Disable replacement</button>
+</div>
+<div id="blurControls">
+  <button id="blur">Blur my background!</button>
+  <button id="disableBlur" style="display: none;">Disable blur</button>
+  <input id="blurSlider" style="display: none;" type="range" min="1" max="200" value="200" />
+</div>
+
+<hr>
+
+<p><a href="http://developers.google.com/+/hangouts/getting-started">Read the docs</a>
+to learn more about developing Hangouts!</a></p>
+
+<script>
+
+// UI controls
+var replace = $('#replace');
+var disableRep = $('#disableRep');
+
+var blur = $('#blur');
+var disableBlur = $('#disableBlur');
+var blurSlider = $('#blurSlider');
+
+/* Background Replacement */
+
+// resources
+var backgroundImageUrl = 'http://www.gstatic.com/chat/apps/fx/v1.12/fx/config/backgrounds/mosaic.png';
+var backgroundImage = gapi.hangout.av.effects.createImageResource(backgroundImageUrl);
+var backgroundReplacement = null;
+
+function addBackgroundReplacementEffect() {
+  // add behavior to UI Controls
+  replace.click(enableReplacement);
+  disableRep.click(disableReplacement);
+}
+
+function enableReplacement() {
+  // Enable background replacement.
+  gapi.hangout.av.effects.requestBackgroundReplacementLock(
+      function(hasLock) {
+        if (!hasLock) {
+          window.console.log('Fail to get the background replacement lock.');
+          return;
+        }
+
+        backgroundReplacement = gapi.hangout.av.effects.getBackgroundReplacement();
+        backgroundReplacement.resetModel();
+        backgroundReplacement.setAlphaThresholdAutoUpdating(true);
+        backgroundReplacement.setImageResource(backgroundImage);
+        backgroundReplacement.setVisible(true);
+        
+        replace.hide();
+        disableRep.show();
+      }
+  );
+
+  // Manually control alpha threshold for background recognition.
+  if (backgroundReplacement != null) {
+    backgroundReplacement.setAlphaThresholdAutoUpdating(false);
+    backgroundReplacement.setAlphaThreshold(200);
+  }
+}
+
+function disableReplacement() {
+  // Disable and release background replacement.
+  gapi.hangout.av.effects.releaseBackgroundReplacementLock();
+  replace.show();
+  disableRep.hide();
+}
+
+/* Background Blur */
+
+var backgroundBlur = null;
+
+function addBackgroundBlurEffect() {
+  blur.click(enableBackgroundBlur);
+  disableBlur.click(disableBackgroundBlur);
+}
+
+function enableBackgroundBlur() {
+  // Enable background blur.
+  backgroundBlur = gapi.hangout.av.effects.createBackgroundBlur();
+  backgroundBlur.setAlphaThresholdAutoUpdating(true);
+  backgroundBlur.setVisible(true);
+
+  // Manually control alpha threshold for background recognition.
+  backgroundBlur.setAlphaThresholdAutoUpdating(false);
+  backgroundBlur.setAlphaThreshold(200);
+  
+  blurSlider.change(function(){
+    backgroundBlur.setBlurWindowSize(parseInt(this.value));
+  });
+  
+  blur.hide();
+  disableBlur.show();
+  blurSlider.show();
+}
+
+function disableBackgroundBlur() {
+  // Disable background blur.
+  backgroundBlur.setVisible(false);
+  
+  blur.show();
+  disableBlur.hide();
+  blurSlider.unbind();
+  blurSlider.hide();
+}
+
+// Kicks off app and attaches all listeners.
+function startApp() {
+ addBackgroundReplacementEffect();
+ addBackgroundBlurEffect();
+}
+
+
+function init() {
+  gapi.hangout.onApiReady.add(
+      function(eventObj) {
+        startApp();
+      });
+}
+
+// Add API listener immediately.  If you need an
+// OAuth 2.0 access token, your startup will need to
+// be different.
+init();
+</script>
