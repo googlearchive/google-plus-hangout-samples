@@ -1,0 +1,161 @@
+<!-- Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy of
+ * the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ * WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ * License for the specific language governing permissions and limitations under
+ * the License
+-->
+
+<!-- This example uses hangoutiframer.  See
+     http://hangoutiframer.appspot.com for further details. -->
+
+<script src="//hangoutsapi.talkgadget.google.com/talkgadget/apps/gadgets/js/rpc.js"></script>
+<!--<script src="//plus.google.com/hangouts/_/api/v1/hangout.js"></script>-->
+<!-- Developer Channel -->
+<script src="//plus.google.com/hangouts/_/api/dev/hangout.js"></script>
+
+<!-- Application configuration -->
+<script src="js/app.js"></script>
+<script src="js/constants.js"></script>
+<script src="js/globals.js"></script>
+
+<!-- The effects utility functions -->
+<script src="js/effects.js"></script>
+
+<!-- Effects demos -->
+<script src="js/basics.js"></script>
+<script src="js/complex.js"></script>
+<script src="js/custom.js"></script>
+
+<body style="background-color:#FFF;">
+
+  <h3>Global Effect Controls</h3>
+  Chain effects<br/>
+  <input type="radio" onClick="g_chain = true" name="chain"/>Enable
+  <input type="radio" checked onClick="g_chain = false" name="chain"/>Disable
+  <button onClick = "showEffectChain()">Show Current Effect Chain</button>
+  <button onClick = "removeLastEffect()">Remove last effect</button>
+  <button onClick = "clearGlobalEffects()">Clear effects</button>
+  <hr/>
+  <h3>The Basics</h3>
+  <button onClick = "autoBcs()">Auto BCS</button>
+  <br/>
+  <button onClick = "backlight()">Backlight</button>
+  <br/>
+  <button onClick = "bilateralFilter()">Bilateral Filter</button>
+  <br/>
+  <button onClick = "blurFace()">Blur Face</button>
+  <br/>
+  <button onClick = "blurSquare()">Blur Region of screen</button>
+  <br/>
+  <button onClick = "cartoonEffect()">Cartoon effect</button>
+  <br/>
+  <button onClick = "centerCrop()">Center crop</button>
+  <br/>
+  <button onClick = "colorCorrect()">Color correct</button>
+  <br/>
+  <button onClick = "colorMatrix()">Color matrix</button>
+  <br/>
+  <button onClick = "cropFace()">Crop Face</button>
+  <br/>
+  <button onClick = "colorTemp()">Color temperature</button>
+  <br/>
+  <!-- copy is demonstrated in background replacement -->
+  <!--
+  <button onClick = "backgroundReplacement()">Copy</button>
+  <br/>
+  -->
+  <button onClick = "duotoneEffect()">DuoTone</button>
+  <br/>
+  <button onClick = "fishEye()">Fisheye effect</button>
+  <br/>
+  <button onClick = "flipEffect()">Flip effect</button>
+  <br/>
+  <button onClick = "grainEffect()">Grain effect</button>
+  <br/>
+  <button onClick = "grayscaleEffect()">Grayscale effect</button>
+  <br/>
+  <!--
+  <button disabled onClick = "handDataEffect()">Hand Data effect</button>
+  <br/>
+  <button disabled onClick = "handOverlayEffect()">Hand Overlay effect</button>
+  <br/>
+  -->
+  <button onClick = "lowbandwidthSobelEffect()">Low BW Sobel effect</button>
+  <br/>
+  <button onClick = "luminanceEnhancer()">Luminance enhancer</button>
+  <br/>
+  <button onClick = "negativeEffect()">Negative effect</button>
+  <br/>
+  <!--
+  <button disabled onClick = "overlayEffect()" >Overlay effect</button>
+  <br/>
+  <button disabled onClick = "audioEffect()" >Play Audio effect</button>
+  <br/>-->
+  <button onClick = "quantizationEffect()">Quantize effect</button>
+  <br/>
+  <!--
+  <button onClick = "resizeEffect()">Resize effect</button>
+  <br/>
+  <button onClick = "saturateEffect()">Saturate effect</button>
+  <br/>
+  -->
+  <button onClick = "sepiaEffect()">Sepia effect</button>
+  <br/>
+  <button onClick = "simpleBcsEffect()">Simple BCS effect</button>
+  <br/>
+  <!--<button disabled onClick = "snapshotEffect()">Snapshot effect</button>
+  <br/>-->
+  <button onClick = "sobelEffect()">Sobel effect</button>
+  <br/>
+  <!--
+  <button onClick = "staticOverlayEffect()">Static overlay effect</button>
+  <br/>
+  -->
+  <button onClick = "surfaceBlurEffect()">Surface blur effect</button>
+  <br/>
+  <!--<button disabled onClick = "swapEffect()">Swap effect</button>
+  <br/>-->
+  <button onClick = "temporalBlurEffect()">Temporal blur effect</button>
+  <br/>
+  <button onClick = "tintEffect()">Tint effect</button>
+  <br/>
+  <button onClick = "vignetteEffect()">Vignette effect</button>
+  <br/>
+  <button onClick = "warmifyEffect()">Warmify effect</button>
+  <br/>
+  <button onClick = "whiteblackEffect()">White/Black effect</button>
+  <hr/>
+  <h3>More complex</h3>
+  <button onClick = "backgroundReplacement()">Background Replacement</button>
+  <br/>
+  <button onClick = "faceData()">Blur eyes</button>
+  <br/>
+  <button onClick = "purtyEffect()">Prettify effect</button>
+  <br/>
+  <button onClick = "squintEffect()">Squint effect</button>
+  <hr/>
+  <button onClick = "rotoEffect()">Custom cartoon effect</button>
+  <hr/>
+  <h3>Custom Effects</h3>
+  <div>
+    <select onChange="selectedCustomEffect()" id="effects">
+      <option>--</option>
+    </select>
+    <p>
+    <div id='sliders'></div>
+    <p>
+    <button onClick="applyCustomEffect()">Apply Custom Effect</button>
+  </div>
+  <hr/>
+  <script>
+    // Add startup listener immediately. If you need an
+    // OAuth 2.0 access token, your startup will be different.
+    init();
+  </script>
+</body>
